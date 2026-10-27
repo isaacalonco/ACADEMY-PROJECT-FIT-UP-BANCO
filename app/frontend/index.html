@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FIT UP | Sistema de Gestão de Academia</title>
+    <meta name="description" content="Sistema de gestão para academias: controle de alunos, instrutores, planos e pagamentos.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700;800&family=Syne:wght@700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+    <!-- Ícones Phosphor -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- Estilos -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- ======================================================================
+         TELA DE LOGIN
+         ====================================================================== -->
+    <div id="auth-container" class="auth-overlay" role="main">
+
+        <!-- Coluna esquerda: Identidade visual -->
+        <div class="auth-hero-panel" aria-hidden="true">
+            <div class="auth-hero-brand">
+                <div class="brand-symbol">
+                    <i class="ph-bold ph-barbell"></i>
+                </div>
+                <div class="brand-wordmark">FIT UP<span>.</span></div>
+            </div>
+
+            <div class="auth-hero-center">
+                <div class="auth-tagline">Sistema de gestão de academia</div>
+                <h1 class="auth-headline">Treine.<br>Gerencie.<br><em>Cresça.</em></h1>
+                <p class="auth-desc">
+                    Controle completo de alunos, instrutores, planos e financeiro — tudo em um só lugar.
+                </p>
+            </div>
+
+            <div class="auth-hero-stats">
+                <div class="auth-hero-stat-item">
+                    <strong>Alunos</strong>
+                    <span>Cadastro completo</span>
+                </div>
+                <div class="auth-hero-stat-item">
+                    <strong>Financeiro</strong>
+                    <span>Controle de pagamentos</span>
+                </div>
+                <div class="auth-hero-stat-item">
+                    <strong>Rápido</strong>
+                    <span>Roda localmente</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Coluna direita: Formulário de login -->
+        <div class="auth-form-panel">
+            <div class="auth-card-box">
+                <div class="auth-card-header">
+                    <h2>Entrar no sistema</h2>
+                    <p>Informe seu e-mail e senha para acessar</p>
+                </div>
+
+                <div id="auth-error-box" class="auth-alert-error" role="alert">
+                    <i class="ph-bold ph-warning-circle" aria-hidden="true"></i>
+                    <span id="auth-error-msg">E-mail ou senha incorretos. Tente novamente.</span>
+                </div>
+
+                <form id="form-login" class="auth-form-body" novalidate>
+                    <div class="field-block">
+                        <label for="login-email">E-mail</label>
+                        <div class="input-container">
+                            <i class="ph ph-envelope-simple field-icon" aria-hidden="true"></i>
+                            <input
+                                type="email"
+                                id="login-email"
+                                name="email"
+                                required
+                                placeholder="admin@fitup.com"
+                                autocomplete="email"
+                                aria-describedby="auth-error-msg"
+                            >
+                        </div>
+                    </div>
+
+                    <div class="field-block">
+                        <label for="login-senha">Senha</label>
+                        <div class="input-container">
+                            <i class="ph ph-lock-key field-icon" aria-hidden="true"></i>
+                            <input
+                                type="password"
+                                id="login-senha"
+                                name="senha"
+                                required
+                                placeholder="••••••••"
+                                autocomplete="current-password"
+                                aria-describedby="auth-error-msg"
+                            >
+                            <button
+                                type="button"
+                                id="btn-toggle-senha"
+                                class="btn-toggle-eye"
+                                aria-label="Mostrar ou ocultar senha"
+                                title="Mostrar ou ocultar senha"
+                            >
+                                <i class="ph ph-eye" id="icon-toggle-senha" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Acesso rápido para teste -->
+                    <div class="demo-credentials-pill">
+                        <div>
+                            <span>Acesso de demonstração:</span>
+                            <code>admin@fitup.com</code> / <code>Senha@123</code>
+                        </div>
+                        <button type="button" id="btn-fill-demo" class="btn-quick-fill">
+                            <i class="ph ph-lightning" aria-hidden="true"></i> Preencher
+                        </button>
+                    </div>
+
+                    <button type="submit" id="btn-login-submit" class="btn-submit-action">
+                        <span>Entrar</span>
+                        <i class="ph-bold ph-arrow-right" aria-hidden="true"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======================================================================
+         APLICAÇÃO PRINCIPAL
+         ====================================================================== -->
+    <div id="app-layout" class="app-shell">
+
+        <!-- BARRA LATERAL DE NAVEGAÇÃO -->
+        <aside class="app-sidebar" role="navigation" aria-label="Menu principal">
+            <header class="sidebar-header">
+                <div class="sidebar-brand-group">
+                    <div class="sidebar-symbol" aria-hidden="true">
+                        <i class="ph-bold ph-barbell"></i>
+                    </div>
+                    <div class="sidebar-title">FIT UP<span>.</span></div>
+                </div>
+                <span class="club-edition-tag">PRO</span>
+            </header>
+
+            <div class="sidebar-menu-label">Menu</div>
+            <nav>
+                <ul class="sidebar-nav-list">
+                    <li class="sidebar-nav-item active" data-page="dashboard">
+                        <a href="#" aria-current="page">
+                            <i class="ph ph-squares-four nav-ico" aria-hidden="true"></i>
+                            Painel Geral
+                            <span class="nav-counter" id="badge-nav-dash" aria-label="painel ativo">⚡</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item" data-page="alunos">
+                        <a href="#">
+                            <i class="ph ph-users nav-ico" aria-hidden="true"></i>
+                            Alunos
+                            <span class="nav-counter" id="badge-nav-alunos">0</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item" data-page="instrutores">
+                        <a href="#">
+                            <i class="ph ph-chalkboard-teacher nav-ico" aria-hidden="true"></i>
+                            Instrutores
+                            <span class="nav-counter" id="badge-nav-instrutores">0</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item" data-page="planos">
+                        <a href="#">
+                            <i class="ph ph-clipboard-text nav-ico" aria-hidden="true"></i>
+                            Planos
+                            <span class="nav-counter" id="badge-nav-planos">0</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item" data-page="pagamentos">
+                        <a href="#">
+                            <i class="ph ph-currency-dollar nav-ico" aria-hidden="true"></i>
+                            Pagamentos
+                            <span class="nav-counter" id="badge-nav-pagamentos">0</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <footer class="sidebar-profile">
+                <div class="profile-identity">
+                    <div class="profile-avatar-stamp" id="sidebar-user-avatar" aria-hidden="true">AD</div>
+                    <div class="profile-meta">
+                        <div class="profile-name" id="sidebar-user-name">Administrador</div>
+                        <div class="profile-badge">Online</div>
+                    </div>
+                </div>
+                <button class="btn-exit" id="btn-logout-sidebar" title="Sair do sistema" aria-label="Sair do sistema">
+                    <i class="ph-bold ph-sign-out" aria-hidden="true"></i>
+                </button>
+            </footer>
+        </aside>
+
+        <!-- ÁREA DE CONTEÚDO -->
+        <div class="main-stage">
+
+            <!-- BARRA SUPERIOR -->
+            <header class="command-topbar">
+                <div class="page-descriptor">
+                    <span class="descriptor-slash" aria-hidden="true">/</span>
+                    <div>
+                        <h2 class="descriptor-title" id="current-page-title">Painel Geral</h2>
+                        <span class="descriptor-subtitle" id="current-page-subtitle">Resumo da academia</span>
+                    </div>
+                </div>
+
+                <div class="topbar-controls">
+                    <div class="omnibox-search" role="search">
+                        <i class="ph ph-magnifying-glass" aria-hidden="true"></i>
+                        <input
+                            type="search"
+                            id="global-search-input"
+                            placeholder="Buscar aluno, instrutor ou plano..."
+                            aria-label="Buscar no sistema"
+                        >
+                    </div>
+
+                    <div class="telemetry-chip" role="status" aria-live="polite" aria-label="Status da API">
+                        <span class="telemetry-pulse" aria-hidden="true"></span>
+                        <span>API Online</span>
+                    </div>
+
+                    <time class="telemetry-time" id="live-datetime-clock" aria-live="off">
+                        <i class="ph ph-clock" aria-hidden="true"></i> Carregando...
+                    </time>
+                </div>
+            </header>
+
+            <!-- CONTEÚDO DAS PÁGINAS -->
+            <main class="stage-viewport" id="main-content" tabindex="-1">
+
+                <!-- ==================== PAINEL GERAL ==================== -->
+                <section id="page-dashboard" class="page-view active-view" aria-labelledby="title-dashboard">
+
+                    <!-- Cards de métricas -->
+                    <div class="bento-grid" role="list" aria-label="Métricas da academia">
+
+                        <article class="bento-card kpi-volt" role="listitem">
+                            <div class="bento-card-top">
+                                <span class="bento-card-label">Alunos cadastrados</span>
+                                <div class="bento-icon-badge" aria-hidden="true"><i class="ph-bold ph-users"></i></div>
+                            </div>
+                            <div class="bento-big-value" id="stat-alunos" aria-label="Total de alunos">0</div>
+                            <div class="bento-footer-note">
+                                <strong>Total</strong> <span>de matrículas ativas</span>
+                            </div>
+                        </article>
+
+                        <article class="bento-card kpi-cyan" role="listitem">
+                            <div class="bento-card-top">
+                                <span class="bento-card-label">Instrutores</span>
+                                <div class="bento-icon-badge" aria-hidden="true"><i class="ph-bold ph-chalkboard-teacher"></i></div>
+                            </div>
+                            <div class="bento-big-value" id="stat-instrutores" aria-label="Total de instrutores">0</div>
+                            <div class="bento-footer-note">
+                                <strong>Profissionais</strong> <span>registrados</span>
+                            </div>
+                        </article>
+
+                        <article class="bento-card kpi-emerald" role="listitem">
+                            <div class="bento-card-top">
+                                <span class="bento-card-label">Planos disponíveis</span>
+                                <div class="bento-icon-badge" aria-hidden="true"><i class="ph-bold ph-clipboard-text"></i></div>
+                            </div>
+                            <div class="bento-big-value" id="stat-planos" aria-label="Total de planos">0</div>
+                            <div class="bento-footer-note">
+                                <strong>Opções</strong> <span>de assinatura</span>
+                            </div>
+                        </article>
+
+                        <article class="bento-card kpi-amber" role="listitem">
+                            <div class="bento-card-top">
+                                <span class="bento-card-label">Pagamentos registrados</span>
+                                <div class="bento-icon-badge" aria-hidden="true"><i class="ph-bold ph-currency-dollar"></i></div>
+                            </div>
+                            <div class="bento-big-value" id="stat-pagamentos" aria-label="Total de pagamentos">0</div>
+                            <div class="bento-footer-note">
+                                <strong>Mensalidades</strong> <span>lançadas</span>
+                            </div>
+                        </article>
+                    </div>
+
+                    <!-- Ações rápidas -->
+                    <div class="quick-action-strip" role="list" aria-label="Ações rápidas">
+                        <div class="quick-action-button" role="listitem" data-modal="modal-aluno" data-action="create" tabindex="0" aria-label="Cadastrar novo aluno">
+                            <div class="btn-symbol" aria-hidden="true"><i class="ph-bold ph-user-plus"></i></div>
+                            <div>
+                                <h4>Cadastrar Aluno</h4>
+                                <p>Adicionar nova matrícula</p>
+                            </div>
+                        </div>
+                        <div class="quick-action-button" role="listitem" data-modal="modal-pagamento" data-action="create" tabindex="0" aria-label="Registrar pagamento">
+                            <div class="btn-symbol" aria-hidden="true"><i class="ph-bold ph-receipt"></i></div>
+                            <div>
+                                <h4>Lançar Pagamento</h4>
+                                <p>Registrar mensalidade</p>
+                            </div>
+                        </div>
+                        <div class="quick-action-button" role="listitem" data-modal="modal-instrutor" data-action="create" tabindex="0" aria-label="Cadastrar novo instrutor">
+                            <div class="btn-symbol" aria-hidden="true"><i class="ph-bold ph-identification-card"></i></div>
+                            <div>
+                                <h4>Novo Instrutor</h4>
+                                <p>Adicionar profissional</p>
+                            </div>
+                        </div>
+                        <div class="quick-action-button" role="listitem" data-modal="modal-plano" data-action="create" tabindex="0" aria-label="Criar novo plano">
+                            <div class="btn-symbol" aria-hidden="true"><i class="ph-bold ph-tag"></i></div>
+                            <div>
+                                <h4>Criar Plano</h4>
+                                <p>Configurar nova assinatura</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tabela de últimos alunos -->
+                    <div class="table-craft-panel">
+                        <div class="table-craft-header">
+                            <h3><i class="ph-bold ph-users" aria-hidden="true"></i> Últimos alunos cadastrados</h3>
+                            <button class="btn-outline" onclick="navigateToPage('alunos')" aria-label="Ver lista completa de alunos">
+                                <span>Ver todos</span>
+                                <i class="ph ph-arrow-right" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                        <div class="table-scrollable">
+                            <table aria-label="Últimos alunos cadastrados">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Nome</th>
+                                        <th scope="col">CPF</th>
+                                        <th scope="col">Contato</th>
+                                        <th scope="col">Plano</th>
+                                        <th scope="col">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dashboard-alunos-table">
+                                    <tr class="empty-craft-row">
+                                        <td colspan="5">Carregando registros...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==================== ALUNOS ==================== -->
+                <section id="page-alunos" class="page-view" aria-labelledby="title-alunos">
+                    <div class="action-banner">
+                        <div class="action-banner-heading">
+                            <h3 id="title-alunos">Gestão de Alunos</h3>
+                            <p>Cadastro, edição e controle de planos de cada aluno</p>
+                        </div>
+                        <button class="btn-athletic" data-modal="modal-aluno" data-action="create" aria-label="Cadastrar novo aluno">
+                            <i class="ph-bold ph-plus" aria-hidden="true"></i> Novo Aluno
+                        </button>
+                    </div>
+
+                    <div class="table-craft-panel">
+                        <div class="table-craft-header">
+                            <h3><i class="ph-bold ph-users" aria-hidden="true"></i> Lista de Alunos</h3>
+                            <input
+                                type="search"
+                                id="search-alunos-filter"
+                                class="table-search-field"
+                                placeholder="Buscar por nome ou CPF..."
+                                aria-label="Filtrar alunos por nome ou CPF"
+                            >
+                        </div>
+                        <div class="table-scrollable">
+                            <table aria-label="Lista de alunos">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">ID</th>
+                                        <th scope="col">Nome / Telefone</th>
+                                        <th scope="col">CPF</th>
+                                        <th scope="col">E-mail</th>
+                                        <th scope="col">Plano</th>
+                                        <th scope="col">IMC</th>
+                                        <th scope="col">Status</th>
+                                        <th scope="col" style="text-align: right;">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="alunos-table"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==================== INSTRUTORES ==================== -->
+                <section id="page-instrutores" class="page-view" aria-labelledby="title-instrutores">
+                    <div class="action-banner">
+                        <div class="action-banner-heading">
+                            <h3 id="title-instrutores">Gestão de Instrutores</h3>
+                            <p>Profissionais da academia e suas especialidades</p>
+                        </div>
+                        <button class="btn-athletic" data-modal="modal-instrutor" data-action="create" aria-label="Cadastrar novo instrutor">
+                            <i class="ph-bold ph-plus" aria-hidden="true"></i> Novo Instrutor
+                        </button>
+                    </div>
+
+                    <div class="table-craft-panel">
+                        <div class="table-craft-header">
+                            <h3><i class="ph-bold ph-chalkboard-teacher" aria-hidden="true"></i> Lista de Instrutores</h3>
+                            <input
+                                type="search"
+                                id="search-instrutores-filter"
+                                class="table-search-field"
+                                placeholder="Buscar instrutor..."
+                                aria-label="Filtrar instrutores"
+                            >
+                        </div>
+                        <div class="table-scrollable">
+                            <table aria-label="Lista de instrutores">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">ID</th>
+                                        <th scope="col">Profissional</th>
+                                        <th scope="col">CPF</th>
+                                        <th scope="col">Contato</th>
+                                        <th scope="col">Especialidade</th>
+                                        <th scope="col" style="text-align: right;">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="instrutores-table"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==================== PLANOS ==================== -->
+                <section id="page-planos" class="page-view" aria-labelledby="title-planos">
+                    <div class="action-banner">
+                        <div class="action-banner-heading">
+                            <h3 id="title-planos">Planos e Assinaturas</h3>
+                            <p>Configuração de mensalidades e pacotes disponíveis</p>
+                        </div>
+                        <button class="btn-athletic" data-modal="modal-plano" data-action="create" aria-label="Criar novo plano">
+                            <i class="ph-bold ph-plus" aria-hidden="true"></i> Novo Plano
+                        </button>
+                    </div>
+
+                    <div class="table-craft-panel">
+                        <div class="table-craft-header">
+                            <h3><i class="ph-bold ph-clipboard-text" aria-hidden="true"></i> Lista de Planos</h3>
+                            <input
+                                type="search"
+                                id="search-planos-filter"
+                                class="table-search-field"
+                                placeholder="Buscar plano..."
+                                aria-label="Filtrar planos"
+                            >
+                        </div>
+                        <div class="table-scrollable">
+                            <table aria-label="Lista de planos">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">ID</th>
+                                        <th scope="col">Nome do Plano</th>
+                                        <th scope="col">Valor Mensal</th>
+                                        <th scope="col" style="text-align: right;">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="planos-table"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==================== PAGAMENTOS ==================== -->
+                <section id="page-pagamentos" class="page-view" aria-labelledby="title-pagamentos">
+                    <div class="action-banner">
+                        <div class="action-banner-heading">
+                            <h3 id="title-pagamentos">Controle de Pagamentos</h3>
+                            <p>Histórico de mensalidades e status financeiro dos alunos</p>
+                        </div>
+                        <button class="btn-athletic" data-modal="modal-pagamento" data-action="create" aria-label="Registrar novo pagamento">
+                            <i class="ph-bold ph-plus" aria-hidden="true"></i> Novo Pagamento
+                        </button>
+                    </div>
+
+                    <div class="table-craft-panel">
+                        <div class="table-craft-header">
+                            <h3><i class="ph-bold ph-receipt" aria-hidden="true"></i> Histórico de Pagamentos</h3>
+                            <input
+                                type="search"
+                                id="search-pagamentos-filter"
+                                class="table-search-field"
+                                placeholder="Buscar por aluno ou status..."
+                                aria-label="Filtrar pagamentos"
+                            >
+                        </div>
+                        <div class="table-scrollable">
+                            <table aria-label="Histórico de pagamentos">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">ID</th>
+                                        <th scope="col">Aluno</th>
+                                        <th scope="col">Valor</th>
+                                        <th scope="col">Status</th>
+                                        <th scope="col" style="text-align: right;">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="pagamentos-table"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- ======================================================================
+         MODAIS
+         ====================================================================== -->
+
+    <!-- Modal: Aluno -->
+    <div id="modal-aluno" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modal-aluno-title">
+        <div class="modal-sheet">
+            <header class="modal-sheet-header">
+                <h2 id="modal-aluno-title"><i class="ph-bold ph-user-plus" aria-hidden="true"></i> Cadastrar Aluno</h2>
+                <button class="btn-modal-dismiss close-btn" aria-label="Fechar janela"><i class="ph ph-x" aria-hidden="true"></i></button>
+            </header>
+            <form id="form-aluno" novalidate>
+                <div class="modal-sheet-body">
+                    <input type="hidden" name="id" value="">
+
+                    <div class="form-sub-header">Dados Pessoais</div>
+                    <div class="form-grid-2">
+                        <div class="field-group">
+                            <label for="aluno-nome">Nome Completo *</label>
+                            <input type="text" id="aluno-nome" name="nome" required placeholder="Ex: Lucas Ferreira">
+                        </div>
+                        <div class="field-group">
+                            <label for="aluno-cpf">CPF *</label>
+                            <input type="text" id="aluno-cpf" name="cpf" required placeholder="000.000.000-00">
+                        </div>
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="field-group">
+                            <label for="aluno-email">E-mail *</label>
+                            <input type="email" id="aluno-email" name="email" required placeholder="lucas@exemplo.com">
+                        </div>
+                        <div class="field-group">
+                            <label for="aluno-telefone">Telefone</label>
+                            <input type="tel" id="aluno-telefone" name="telefone" placeholder="(11) 99999-9999">
+                        </div>
+                    </div>
+
+                    <div class="field-group">
+                        <label for="aluno-endereco">Endereço</label>
+                        <input type="text" id="aluno-endereco" name="endereco" placeholder="Rua, Número, Bairro, Cidade">
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="field-group">
+                            <label for="aluno-nascimento">Data de Nascimento *</label>
+                            <input type="date" id="aluno-nascimento" name="dataNascimento" required>
+                        </div>
+                        <div class="field-group">
+                            <label for="select-plano-aluno">Plano de Matrícula</label>
+                            <select id="select-plano-aluno" name="idPlano">
+                                <option value="">Sem plano</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-sub-header">Avaliação Física</div>
+                    <div class="form-grid-2">
+                        <div class="field-group">
+                            <label for="aluno-peso">Peso (kg)</label>
+                            <input type="number" step="0.1" id="aluno-peso" name="peso" placeholder="Ex: 75.5">
+                        </div>
+                        <div class="field-group">
+                            <label for="aluno-altura">Altura (m)</label>
+                            <input type="number" step="0.01" id="aluno-altura" name="altura" placeholder="Ex: 1.78">
+                        </div>
+                    </div>
+                </div>
+
+                <footer class="modal-sheet-footer">
+                    <button type="button" class="btn-outline close-btn">Cancelar</button>
+                    <button type="submit" class="btn-athletic" id="btn-submit-aluno">
+                        <i class="ph-bold ph-check" aria-hidden="true"></i> Salvar Aluno
+                    </button>
+                </footer>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Instrutor -->
+    <div id="modal-instrutor" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modal-instrutor-title">
+        <div class="modal-sheet">
+            <header class="modal-sheet-header">
+                <h2 id="modal-instrutor-title"><i class="ph-bold ph-chalkboard-teacher" aria-hidden="true"></i> Cadastrar Instrutor</h2>
+                <button class="btn-modal-dismiss close-btn" aria-label="Fechar janela"><i class="ph ph-x" aria-hidden="true"></i></button>
+            </header>
+            <form id="form-instrutor" novalidate>
+                <div class="modal-sheet-body">
+                    <input type="hidden" name="idInstrutor" value="">
+
+                    <div class="form-sub-header">Informações do Profissional</div>
+                    <div class="form-grid-2">
+                        <div class="field-group">
+                            <label for="instrutor-nome">Nome Completo *</label>
+                            <input type="text" id="instrutor-nome" name="nome" required placeholder="Ex: Rodrigo Mendes">
+                        </div>
+                        <div class="field-group">
+                            <label for="instrutor-cpf">CPF *</label>
+                            <input type="text" id="instrutor-cpf" name="cpf" required placeholder="000.000.000-00">
+                        </div>
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="field-group">
+                            <label for="instrutor-email">E-mail</label>
+                            <input type="email" id="instrutor-email" name="email" placeholder="rodrigo@fitup.com">
+                        </div>
+                        <div class="field-group">
+                            <label for="instrutor-telefone">Telefone</label>
+                            <input type="tel" id="instrutor-telefone" name="telefone" placeholder="(11) 98888-8888">
+                        </div>
+                    </div>
+
+                    <div class="form-sub-header">Especialidade</div>
+                    <div class="field-group">
+                        <label for="instrutor-especialidade">Modalidade / Especialidade *</label>
+                        <input type="text" id="instrutor-especialidade" name="especialidade" required placeholder="Ex: Musculação, CrossFit, Pilates">
+                    </div>
+                </div>
+
+                <footer class="modal-sheet-footer">
+                    <button type="button" class="btn-outline close-btn">Cancelar</button>
+                    <button type="submit" class="btn-athletic" id="btn-submit-instrutor">
+                        <i class="ph-bold ph-check" aria-hidden="true"></i> Salvar Instrutor
+                    </button>
+                </footer>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Plano -->
+    <div id="modal-plano" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modal-plano-title">
+        <div class="modal-sheet">
+            <header class="modal-sheet-header">
+                <h2 id="modal-plano-title"><i class="ph-bold ph-clipboard-text" aria-hidden="true"></i> Cadastrar Plano</h2>
+                <button class="btn-modal-dismiss close-btn" aria-label="Fechar janela"><i class="ph ph-x" aria-hidden="true"></i></button>
+            </header>
+            <form id="form-plano" novalidate>
+                <div class="modal-sheet-body">
+                    <input type="hidden" name="id" value="">
+
+                    <div class="field-group">
+                        <label for="plano-nome">Nome do Plano *</label>
+                        <input type="text" id="plano-nome" name="nome" required placeholder="Ex: Plano Mensal, Plano VIP">
+                    </div>
+                    <div class="field-group">
+                        <label for="plano-valor">Valor Mensal (R$) *</label>
+                        <input type="number" step="0.01" id="plano-valor" name="valor" required placeholder="Ex: 119.90">
+                    </div>
+                </div>
+
+                <footer class="modal-sheet-footer">
+                    <button type="button" class="btn-outline close-btn">Cancelar</button>
+                    <button type="submit" class="btn-athletic" id="btn-submit-plano">
+                        <i class="ph-bold ph-check" aria-hidden="true"></i> Salvar Plano
+                    </button>
+                </footer>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Pagamento -->
+    <div id="modal-pagamento" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modal-pagamento-title">
+        <div class="modal-sheet">
+            <header class="modal-sheet-header">
+                <h2 id="modal-pagamento-title"><i class="ph-bold ph-receipt" aria-hidden="true"></i> Lançar Pagamento</h2>
+                <button class="btn-modal-dismiss close-btn" aria-label="Fechar janela"><i class="ph ph-x" aria-hidden="true"></i></button>
+            </header>
+            <form id="form-pagamento" novalidate>
+                <div class="modal-sheet-body">
+                    <input type="hidden" name="idPagamento" value="">
+
+                    <div class="field-group">
+                        <label for="select-aluno-pagamento">Aluno *</label>
+                        <select id="select-aluno-pagamento" name="idAluno" required>
+                            <option value="">Selecione o aluno</option>
+                        </select>
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="field-group">
+                            <label for="pagamento-valor">Valor (R$) *</label>
+                            <input type="number" step="0.01" id="pagamento-valor" name="valor" placeholder="Valor da mensalidade">
+                        </div>
+                        <div class="field-group">
+                            <label for="pagamento-status">Status *</label>
+                            <select id="pagamento-status" name="status" required>
+                                <option value="Pago">Pago</option>
+                                <option value="Pendente">Pendente</option>
+                                <option value="Atrasado">Atrasado</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <footer class="modal-sheet-footer">
+                    <button type="button" class="btn-outline close-btn">Cancelar</button>
+                    <button type="submit" class="btn-athletic" id="btn-submit-pagamento">
+                        <i class="ph-bold ph-check" aria-hidden="true"></i> Registrar Pagamento
+                    </button>
+                </footer>
+            </form>
+        </div>
+    </div>
+
+    <!-- NOTIFICAÇÕES TOAST -->
+    <div class="toast-rack" id="toast-container" aria-live="polite" aria-atomic="false"></div>
+
+    <!-- API Configuration — set your Railway backend URL here after deploy -->
+    <script>
+        // LOCAL DEV: leave empty (same-origin, served by Java backend)
+        // PRODUCTION: set to your Railway URL, e.g. 'https://your-app.up.railway.app'
+        window.FITUP_API_URL = 'https://academy-project-fit-up-production.up.railway.app';
+    </script>
+    <script src="app.js"></script>
+</body>
+</html>

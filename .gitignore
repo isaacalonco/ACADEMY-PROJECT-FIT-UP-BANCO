@@ -1,0 +1,27 @@
+# Build e binários
+app/backend/target/
+*.jar
+*.class
+
+# Banco local e arquivos gerados em runtime
+*.db
+*.log
+
+# Credenciais reais ficam fora do versionamento (Etapa 2 — B2)
+app/backend/src/main/resources/application.properties
+.env
+*.env
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+
+# Sistema operacional / Office
+Thumbs.db
+.DS_Store
+~$*
+*.tmp
