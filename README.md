@@ -78,3 +78,4 @@ No Windows (PowerShell), use o mesmo comando com `psql.exe`; a codificação dos
 ## Declaração de uso de inteligência artificial
 
 Assistentes de IA foram utilizados como apoio na escrita de código SQL, na geração de dados sintéticos, na revisão textual dos documentos. Todos os scripts foram executados pela equipe do início ao fim em base limpa e todas as contagens e afirmações dos documentos foram conferidas contra o resultado real dessa execução. A seção 7 do relatório detalha o uso.
+hugo
