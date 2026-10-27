@@ -17,4 +17,3 @@ Os scripts executáveis encontram-se na pasta [`../sql/`]:
 - **[`01_ddl.sql`]**: Criação física com restrições padronizadas (`pk_`, `uq_`, `fk_`, `ck_`, `idx_`) e integridade referencial com `ON DELETE` e `ON UPDATE`.
 - **[`02_carga.sql`]**: Carga sintética com 50 indivíduos e 114 pagamentos, contemplando casos de contorno.
 - **[`03_consultas.sql`]**: 15 Consultas comentadas (5 Básicas, 5 Junções/Agregação, 5 Avançadas com subconsultas e `EXISTS`).
-12
