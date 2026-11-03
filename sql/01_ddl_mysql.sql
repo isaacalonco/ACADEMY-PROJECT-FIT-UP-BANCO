@@ -88,7 +88,7 @@ CREATE TABLE tb_instrutor (
     CONSTRAINT uq_instrutor_cref         UNIQUE (registro_cref),                                -- RN02
     CONSTRAINT ck_instrutor_cref_formato CHECK (registro_cref REGEXP '^CREF-[0-9]{6}-G/[A-Z]{2}$'),  -- RN02
     CONSTRAINT ck_instrutor_salario      CHECK (salario_base > 0.00),                           -- RN02
-    CONSTRAINT ck_instrutor_nao_autosupervisao CHECK (id_supervisor IS NULL OR id_supervisor <> id_instrutor), -- RN03
+    -- RN03: vedacao de autosupervisao validada por triggers (compatibilidade com FKs MySQL).
     CONSTRAINT fk_instrutor_pessoa FOREIGN KEY (id_instrutor)
         REFERENCES tb_pessoa (id_pessoa)
         ON DELETE CASCADE
@@ -96,7 +96,7 @@ CREATE TABLE tb_instrutor (
     CONSTRAINT fk_instrutor_supervisor FOREIGN KEY (id_supervisor)                              -- RN03
         REFERENCES tb_instrutor (id_instrutor)
         ON DELETE SET NULL
-        ON UPDATE CASCADE
+        ON UPDATE RESTRICT
 );
 
 -- ----------------------------------------------------------------------------
@@ -113,7 +113,7 @@ CREATE TABLE tb_aluno (
     CONSTRAINT pk_aluno            PRIMARY KEY (id_aluno),
     CONSTRAINT uq_aluno_matricula  UNIQUE (codigo_matricula),                                   -- RN04
     CONSTRAINT ck_aluno_status     CHECK (status_cadastral IN ('Ativo', 'Trancado', 'Cancelado', 'Inadimplente')), -- RN04
-    CONSTRAINT ck_aluno_nao_autoindicacao CHECK (id_aluno_indicador IS NULL OR id_aluno_indicador <> id_aluno),   -- RN05
+    -- RN05: vedacao de autoindicacao validada por triggers (compatibilidade com FKs MySQL).
     CONSTRAINT fk_aluno_pessoa FOREIGN KEY (id_aluno)
         REFERENCES tb_pessoa (id_pessoa)
         ON DELETE CASCADE
@@ -121,7 +121,7 @@ CREATE TABLE tb_aluno (
     CONSTRAINT fk_aluno_indicador FOREIGN KEY (id_aluno_indicador)                              -- RN05
         REFERENCES tb_aluno (id_aluno)
         ON DELETE SET NULL
-        ON UPDATE CASCADE
+        ON UPDATE RESTRICT
 );
 
 -- ----------------------------------------------------------------------------
@@ -427,7 +427,7 @@ LEFT JOIN tb_ficha_treino f ON f.id_ficha = (
 LEFT JOIN tb_instrutor i ON i.id_instrutor = f.id_instrutor
 LEFT JOIN tb_pessoa pi ON pi.id_pessoa = i.id_instrutor;
 
--- RN01: MySQL não permite CURRENT_DATE em CHECK; triggers mantêm a regra.
+-- RN01, RN03 e RN05: triggers garantem regras incompatíveis com CHECK/FKs no MySQL.
 DELIMITER $$
 CREATE TRIGGER trg_pessoa_nascimento_insert
 BEFORE INSERT ON tb_pessoa FOR EACH ROW
@@ -441,6 +441,38 @@ BEFORE UPDATE ON tb_pessoa FOR EACH ROW
 BEGIN
     IF NEW.data_nascimento > CURRENT_DATE() THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Data de nascimento nao pode ser futura';
+    END IF;
+END$$
+
+-- RN03: impedir instrutor ser supervisor de si mesmo.
+CREATE TRIGGER trg_instrutor_sem_autosupervisao_ins
+BEFORE INSERT ON tb_instrutor FOR EACH ROW
+BEGIN
+    IF NEW.id_supervisor IS NOT NULL AND NEW.id_supervisor = NEW.id_instrutor THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Instrutor nao pode supervisionar a si mesmo';
+    END IF;
+END$$
+CREATE TRIGGER trg_instrutor_sem_autosupervisao_upd
+BEFORE UPDATE ON tb_instrutor FOR EACH ROW
+BEGIN
+    IF NEW.id_supervisor IS NOT NULL AND NEW.id_supervisor = NEW.id_instrutor THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Instrutor nao pode supervisionar a si mesmo';
+    END IF;
+END$$
+
+-- RN05: impedir aluno de indicar a si mesmo.
+CREATE TRIGGER trg_aluno_sem_autoindicacao_ins
+BEFORE INSERT ON tb_aluno FOR EACH ROW
+BEGIN
+    IF NEW.id_aluno_indicador IS NOT NULL AND NEW.id_aluno_indicador = NEW.id_aluno THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Aluno nao pode indicar a si mesmo';
+    END IF;
+END$$
+CREATE TRIGGER trg_aluno_sem_autoindicacao_upd
+BEFORE UPDATE ON tb_aluno FOR EACH ROW
+BEGIN
+    IF NEW.id_aluno_indicador IS NOT NULL AND NEW.id_aluno_indicador = NEW.id_aluno THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Aluno nao pode indicar a si mesmo';
     END IF;
 END$$
 DELIMITER ;
